@@ -1,0 +1,6 @@
+[submodule "contiki"]
+	path = contiki
+	url = https://github.com/retfie/contiki.git
+[submodule "rplinfo"]
+	path = rplinfo
+	url = https://github.com/retfie/rplinfo.git
