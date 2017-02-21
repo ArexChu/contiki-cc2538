@@ -28,15 +28,6 @@ MODULES += core/net core/net/mac \
            core/net/mac/contikimac \
            core/net/llsec core/net/llsec/noncoresec
 
-ifdef ROUTER
-MODULES += core/net/ip64 dev/enc28j60/ 
-
-MODULES += apps/ip64-addr apps/mdns
-CONTIKI_TARGET_SOURCEFILES+=enc28j60-arch.c
-endif
-
-MODULES += apps/simple-rpl apps/aes apps/drowsie
-
 PYTHON = python
 BSL_FLAGS += -e -w -v
 
