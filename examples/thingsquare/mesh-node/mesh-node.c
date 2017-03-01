@@ -1,4 +1,7 @@
-#include "thsq.h"
+#include "contiki.h"
+#include "contiki-net.h"
+#include "leds.h"
+#include <stdio.h>
 
 /*---------------------------------------------------------------------------*/
 PROCESS(mesh_node_process, "Mesh node");

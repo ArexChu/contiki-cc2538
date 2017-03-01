@@ -28,20 +28,12 @@
  */
 
 #include "contiki.h"
-#include "contiki-lib.h"
 #include "contiki-net.h"
-#include "net/uip.h"
 #include "net/rpl/rpl.h"
-
-#include "net/netstack.h"
 #include "dev/button-sensor.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #define DEBUG DEBUG_PRINT
-#include "net/uip-debug.h"
+#include "net/ip/uip-debug.h"
 
 #define UIP_IP_BUF   ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
 

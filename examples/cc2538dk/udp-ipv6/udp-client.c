@@ -28,31 +28,23 @@
  */
 
 #include "contiki.h"
+#include "contiki-lib.h"
 #include "contiki-net.h"
+#include "net/ip/resolv.h"
 
-#define UDP_CLIENT_PORT 8765
-#define UDP_SERVER_PORT 5678
-
-#define UDP_EXAMPLE_ID  190
+#include <string.h>
+#include <stdbool.h>
 
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
-#ifndef PERIOD
-#define PERIOD 60
-#endif
-
-#define START_INTERVAL		(15 * CLOCK_SECOND)
-#define SEND_INTERVAL		(PERIOD * CLOCK_SECOND)
-#define SEND_TIME		(random_rand() % (SEND_INTERVAL))
-#define MAX_PAYLOAD_LEN		30
+#define SEND_INTERVAL		15 * CLOCK_SECOND
+#define MAX_PAYLOAD_LEN		40
 
 static struct uip_udp_conn *client_conn;
-static uip_ipaddr_t server_ipaddr;
-
 /*---------------------------------------------------------------------------*/
 PROCESS(udp_client_process, "UDP client process");
-AUTOSTART_PROCESSES(&udp_client_process);
+AUTOSTART_PROCESSES(&resolv_process,&udp_client_process);
 /*---------------------------------------------------------------------------*/
 static void
 tcpip_handler(void)
@@ -62,22 +54,25 @@ tcpip_handler(void)
   if(uip_newdata()) {
     str = uip_appdata;
     str[uip_datalen()] = '\0';
-    printf("DATA recv '%s'\n", str);
+    printf("Response from the server: '%s'\n", str);
   }
 }
 /*---------------------------------------------------------------------------*/
+static char buf[MAX_PAYLOAD_LEN];
 static void
-send_packet(void *ptr)
+timeout_handler(void)
 {
   static int seq_id;
-  char buf[MAX_PAYLOAD_LEN];
 
-  seq_id++;
-  PRINTF("DATA send to %d 'Hello %d'\n",
-         server_ipaddr.u8[sizeof(server_ipaddr.u8) - 1], seq_id);
-  sprintf(buf, "Hello %d from the client", seq_id);
-  uip_udp_packet_sendto(client_conn, buf, strlen(buf),
-                        &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
+  printf("Client sending to: ");
+  PRINT6ADDR(&client_conn->ripaddr);
+  sprintf(buf, "Hello %d from the client", ++seq_id);
+  printf(" (msg: %s)\n", buf);
+#if SEND_TOO_LARGE_PACKET_TO_TEST_FRAGMENTATION
+  uip_udp_packet_send(client_conn, buf, UIP_APPDATA_SIZE);
+#else /* SEND_TOO_LARGE_PACKET_TO_TEST_FRAGMENTATION */
+  uip_udp_packet_send(client_conn, buf, strlen(buf));
+#endif /* SEND_TOO_LARGE_PACKET_TO_TEST_FRAGMENTATION */
 }
 /*---------------------------------------------------------------------------*/
 static void
@@ -93,103 +88,107 @@ print_local_addresses(void)
        (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
       PRINT6ADDR(&uip_ds6_if.addr_list[i].ipaddr);
       PRINTF("\n");
-      /* hack to make address "final" */
-      if (state == ADDR_TENTATIVE) {
-	uip_ds6_if.addr_list[i].state = ADDR_PREFERRED;
-      }
     }
   }
 }
 /*---------------------------------------------------------------------------*/
+#if UIP_CONF_ROUTER
 static void
 set_global_address(void)
 {
   uip_ipaddr_t ipaddr;
 
-//  uip_ip6addr(&ipaddr, 0xaaaa, 0, 0, 0, 0x212, 0x4b00, 0x42a, 0xeaf7);
-  uip_ip6addr(&ipaddr, 0xfe80, 0, 0, 0, 0x212, 0x4b00, 0x5af, 0x7f61);
-  //fe80::212:4b00:5af:7f61
+  uip_ip6addr(&ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 0);
   uip_ds6_set_addr_iid(&ipaddr, &uip_lladdr);
   uip_ds6_addr_add(&ipaddr, 0, ADDR_AUTOCONF);
-
-/* The choice of server address determines its 6LoPAN header compression.
- * (Our address will be compressed Mode 3 since it is derived from our link-local address)
- * Obviously the choice made here must also be selected in udp-server.c.
- *
- * For correct Wireshark decoding using a sniffer, add the /64 prefix to the 6LowPAN protocol preferences,
- * e.g. set Context 0 to aaaa::.  At present Wireshark copies Context/128 and then overwrites it.
- * (Setting Context 0 to aaaa::1111:2222:3333:4444 will report a 16 bit compressed address of aaaa::1111:22ff:fe33:xxxx)
- *
- * Note the IPCMV6 checksum verification depends on the correct uncompressed addresses.
- */
- 
-#if 0
-/* Mode 1 - 64 bits inline */
-   uip_ip6addr(&server_ipaddr, 0xaaaa, 0, 0, 0, 0, 0, 0, 1);
-#elif 1
-/* Mode 2 - 16 bits inline */
-  uip_ip6addr(&server_ipaddr, 0xaaaa, 0, 0, 0, 0, 0x00ff, 0xfe00, 1);
+}
+#endif /* UIP_CONF_ROUTER */
+/*---------------------------------------------------------------------------*/
+static resolv_status_t
+set_connection_address(uip_ipaddr_t *ipaddr)
+{
+#ifndef UDP_CONNECTION_ADDR
+#if RESOLV_CONF_SUPPORTS_MDNS
+#define UDP_CONNECTION_ADDR       contiki-udp-server.local
+#elif UIP_CONF_ROUTER
+#define UDP_CONNECTION_ADDR       fd00:0:0:0:0212:7404:0004:0404
 #else
-/* Mode 3 - derived from server link-local (MAC) address */
-  uip_ip6addr(&server_ipaddr, 0xaaaa, 0, 0, 0, 0x0250, 0xc2ff, 0xfea8, 0xcd1a); //redbee-econotag
+#define UDP_CONNECTION_ADDR       fe80:0:0:0:212:4b00:5af:7f61
 #endif
+#endif /* !UDP_CONNECTION_ADDR */
+	//fe80::212:4b00:5af:7f61
+
+#define _QUOTEME(x) #x
+#define QUOTEME(x) _QUOTEME(x)
+
+  resolv_status_t status = RESOLV_STATUS_ERROR;
+
+  if(uiplib_ipaddrconv(QUOTEME(UDP_CONNECTION_ADDR), ipaddr) == 0) {
+    uip_ipaddr_t *resolved_addr = NULL;
+    status = resolv_lookup(QUOTEME(UDP_CONNECTION_ADDR),&resolved_addr);
+    if(status == RESOLV_STATUS_UNCACHED || status == RESOLV_STATUS_EXPIRED) {
+      PRINTF("Attempting to look up %s\n",QUOTEME(UDP_CONNECTION_ADDR));
+      resolv_query(QUOTEME(UDP_CONNECTION_ADDR));
+      status = RESOLV_STATUS_RESOLVING;
+    } else if(status == RESOLV_STATUS_CACHED && resolved_addr != NULL) {
+      PRINTF("Lookup of \"%s\" succeded!\n",QUOTEME(UDP_CONNECTION_ADDR));
+    } else if(status == RESOLV_STATUS_RESOLVING) {
+      PRINTF("Still looking up \"%s\"...\n",QUOTEME(UDP_CONNECTION_ADDR));
+    } else {
+      PRINTF("Lookup of \"%s\" failed. status = %d\n",QUOTEME(UDP_CONNECTION_ADDR),status);
+    }
+    if(resolved_addr)
+      uip_ipaddr_copy(ipaddr, resolved_addr);
+  } else {
+    status = RESOLV_STATUS_CACHED;
+  }
+
+  return status;
 }
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(udp_client_process, ev, data)
 {
-  static struct etimer periodic;
-  static struct ctimer backoff_timer;
-#if WITH_COMPOWER
-  static int print = 0;
-#endif
+  static struct etimer et;
+  uip_ipaddr_t ipaddr;
 
   PROCESS_BEGIN();
-
-  PROCESS_PAUSE();
-
-  set_global_address();
-  
   PRINTF("UDP client process started\n");
+
+#if UIP_CONF_ROUTER
+  set_global_address();
+#endif
 
   print_local_addresses();
 
-  /* new connection with remote host */
-  client_conn = udp_new(NULL, UIP_HTONS(UDP_SERVER_PORT), NULL); 
-  if(client_conn == NULL) {
-    PRINTF("No UDP connection available, exiting the process!\n");
-    PROCESS_EXIT();
+  static resolv_status_t status = RESOLV_STATUS_UNCACHED;
+  while(status != RESOLV_STATUS_CACHED) {
+    status = set_connection_address(&ipaddr);
+
+    if(status == RESOLV_STATUS_RESOLVING) {
+      PROCESS_WAIT_EVENT_UNTIL(ev == resolv_event_found);
+    } else if(status != RESOLV_STATUS_CACHED) {
+      PRINTF("Can't get connection address.\n");
+      PROCESS_YIELD();
+    }
   }
-  udp_bind(client_conn, UIP_HTONS(UDP_CLIENT_PORT)); 
+
+  /* new connection with remote host */
+  client_conn = udp_new(&ipaddr, UIP_HTONS(3000), NULL);
+  udp_bind(client_conn, UIP_HTONS(3001));
 
   PRINTF("Created a connection with the server ");
   PRINT6ADDR(&client_conn->ripaddr);
   PRINTF(" local/remote port %u/%u\n",
 	UIP_HTONS(client_conn->lport), UIP_HTONS(client_conn->rport));
 
-#if WITH_COMPOWER
-  powertrace_sniff(POWERTRACE_ON);
-#endif
-
-  etimer_set(&periodic, SEND_INTERVAL);
+  etimer_set(&et, SEND_INTERVAL);
   while(1) {
     PROCESS_YIELD();
-    if(ev == tcpip_event) {
+    if(etimer_expired(&et)) {
+      timeout_handler();
+      etimer_restart(&et);
+    } else if(ev == tcpip_event) {
       tcpip_handler();
-    }
-    
-    if(etimer_expired(&periodic)) {
-      etimer_reset(&periodic);
-      ctimer_set(&backoff_timer, SEND_TIME, send_packet, NULL);
-
-#if WITH_COMPOWER
-      if (print == 0) {
-	powertrace_print("#P");
-      }
-      if (++print == 3) {
-	print = 0;
-      }
-#endif
-
     }
   }
 

@@ -1,5 +1,5 @@
 #include "contiki.h"
-#include "dev/leds.h"
+#include "leds.h"
 /*---------------------------------------------------------------------------*/
 PROCESS(blink_process, "Blink");
 PROCESS(hello_world_process, "hello world process");

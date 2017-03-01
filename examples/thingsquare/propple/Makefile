@@ -2,6 +2,6 @@ all: propple-example
 
 APPS+=propple-socket
 
-THSQ=../..
+CONTIKI=../../..
 
-include $(THSQ)/Makefile.thsq
+include $(CONTIKI)/Makefile.include

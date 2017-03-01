@@ -1,7 +1,4 @@
 all: mesh-node
-APPS+=simple-http-client
-THSQ=../..
+CONTIKI=../../..
 
-include $(THSQ)/Makefile.thsq
-
-
+include $(CONTIKI)/Makefile.include
