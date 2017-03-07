@@ -50,13 +50,9 @@
 #include "dev/i2c.h"
 #include "dev/leds.h"
 #include "dev/tsl256x.h"
-#include <stdbool.h>
 /*---------------------------------------------------------------------------*/
 /* Default sensor's integration cycle is 402ms */
 #define SENSOR_READ_INTERVAL (CLOCK_SECOND)
-
-#define PIR_INT_PORT_BASE  GPIO_PORT_TO_BASE(PIR_INT_PORT)
-#define PIR_INT_PIN_MASK   GPIO_PIN_MASK(PIR_INT_PIN)
 /*---------------------------------------------------------------------------*/
 PROCESS(remote_tsl256x_process, "TSL256X test process");
 AUTOSTART_PROCESSES(&remote_tsl256x_process);
@@ -74,8 +70,6 @@ PROCESS_THREAD(remote_tsl256x_process, ev, data)
 {
   PROCESS_BEGIN();
   static uint16_t light;
-  static uint16_t human;
-  static uint16_t led;
 
   /* Print the sensor used, teh default is the TSL2561 (from Grove) */
   if(TSL256X_REF == TSL2561_SENSOR_REF) {
@@ -86,9 +80,6 @@ PROCESS_THREAD(remote_tsl256x_process, ev, data)
     printf("Unknown light sensor reference, aborting\n");
     PROCESS_EXIT();
   }
-
-  // enable the pir sensor
-  GPIO_SET_INPUT(PIR_INT_PORT_BASE, PIR_INT_PIN_MASK);
 
   /* Use Contiki's sensor macro to enable the sensor */
   SENSORS_ACTIVATE(tsl256x);
@@ -123,27 +114,6 @@ PROCESS_THREAD(remote_tsl256x_process, ev, data)
       printf("or check if the sensor is properly connected\n");
       PROCESS_EXIT();
     }
-	human = GPIO_READ_PIN(PIR_INT_PORT_BASE, PIR_INT_PIN_MASK);
-	led = leds_get();
-
-  	printf("Human = %d\n", human);
-  	printf("Led = %d\n", led);
-	if(human) {
-  		printf("Human\n");
-		if(led == 0) {
-			if(light > 150) {
-			leds_on(LEDS_GREEN);
-  			printf("light high\n");
-			}
-		} else if(light < 100) {
-			leds_off(LEDS_GREEN);
-  			printf("light low\n");
-		}
-
-	} else {
-		leds_on(LEDS_GREEN);	
-  		printf("No Human\n");
-	}
   }
   PROCESS_END();
 }

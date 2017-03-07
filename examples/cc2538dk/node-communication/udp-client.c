@@ -113,10 +113,9 @@ set_connection_address(uip_ipaddr_t *ipaddr)
 #elif UIP_CONF_ROUTER
 #define UDP_CONNECTION_ADDR       fd00:0:0:0:0212:7404:0004:0404
 #else
-#define UDP_CONNECTION_ADDR       fe80:0:0:0:212:4b00:5af:7f61
+#define UDP_CONNECTION_ADDR       fe80:0:0:0:6466:6666:6666:6666
 #endif
 #endif /* !UDP_CONNECTION_ADDR */
-	//fe80::212:4b00:5af:7f61
 
 #define _QUOTEME(x) #x
 #define QUOTEME(x) _QUOTEME(x)
