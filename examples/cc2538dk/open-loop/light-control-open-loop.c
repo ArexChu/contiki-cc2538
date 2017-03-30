@@ -57,6 +57,15 @@
 
 #define PIR_INT_PORT_BASE  GPIO_PORT_TO_BASE(PIR_INT_PORT)
 #define PIR_INT_PIN_MASK   GPIO_PIN_MASK(PIR_INT_PIN)
+
+#define LED1_INT_PORT_BASE  GPIO_PORT_TO_BASE(LED1_INT_PORT)
+#define LED1_INT_PIN_MASK   GPIO_PIN_MASK(LED1_INT_PIN)
+#define LED2_INT_PORT_BASE  GPIO_PORT_TO_BASE(LED2_INT_PORT)
+#define LED2_INT_PIN_MASK   GPIO_PIN_MASK(LED2_INT_PIN)
+#define LED3_INT_PORT_BASE  GPIO_PORT_TO_BASE(LED3_INT_PORT)
+#define LED3_INT_PIN_MASK   GPIO_PIN_MASK(LED3_INT_PIN)
+#define LED4_INT_PORT_BASE  GPIO_PORT_TO_BASE(LED4_INT_PORT)
+#define LED4_INT_PIN_MASK   GPIO_PIN_MASK(LED4_INT_PIN)
 uint16_t light;
 static uint8_t human;
 static uint8_t led;
@@ -64,6 +73,26 @@ static uint8_t led;
 PROCESS(remote_tsl256x_process, "TSL256X test process");
 PROCESS(auto_control_process, "atto control test process");
 AUTOSTART_PROCESSES(&remote_tsl256x_process, &auto_control_process);
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+void
+light_off()
+{
+GPIO_SET_PIN(LED1_INT_PORT_BASE, LED1_INT_PIN_MASK);
+GPIO_SET_PIN(LED2_INT_PORT_BASE, LED2_INT_PIN_MASK);
+GPIO_SET_PIN(LED3_INT_PORT_BASE, LED3_INT_PIN_MASK);
+GPIO_SET_PIN(LED4_INT_PORT_BASE, LED4_INT_PIN_MASK);
+}
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+void
+light_on()
+{
+GPIO_CLR_PIN(LED1_INT_PORT_BASE, LED1_INT_PIN_MASK);
+GPIO_CLR_PIN(LED2_INT_PORT_BASE, LED2_INT_PIN_MASK);
+GPIO_CLR_PIN(LED3_INT_PORT_BASE, LED3_INT_PIN_MASK);
+GPIO_CLR_PIN(LED4_INT_PORT_BASE, LED4_INT_PIN_MASK);
+}
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 void
@@ -139,9 +168,17 @@ PROCESS_THREAD(auto_control_process, ev, data)
   static count;
   static count_no;
   etimer_set(&et, 2 * CLOCK_SECOND);
+  // enable the leds
+GPIO_SET_OUTPUT(LED1_INT_PORT_BASE, LED1_INT_PIN_MASK);
+GPIO_SET_OUTPUT(LED2_INT_PORT_BASE, LED2_INT_PIN_MASK);
+GPIO_SET_OUTPUT(LED3_INT_PORT_BASE, LED3_INT_PIN_MASK);
+GPIO_SET_OUTPUT(LED4_INT_PORT_BASE, LED4_INT_PIN_MASK);
+
+light_off();
+
   // enable the pir sensor
   GPIO_SET_INPUT(PIR_INT_PORT_BASE, PIR_INT_PIN_MASK);
-leds_on(LEDS_ALL);	
+
 count = 0;
 count_no = 0;
   
@@ -156,18 +193,18 @@ while(1)
 		if(count == 3)
 		{
 			count = 0;
-			led = leds_get();
+			led = GPIO_READ_PIN(LED1_INT_PORT_BASE,LED1_INT_PIN_MASK);
 			printf("Human\n");
 			if(led == 0) 
 			{
 				if(light > 150) 
 				{
-					leds_on(LEDS_ALL);
+					light_off();
 					printf("light high\n");
 				}
 			} else if(light < 100) 
 			{
-				leds_off(LEDS_ALL);
+				light_on();
 				printf("light low\n");
 			}
 
@@ -178,7 +215,7 @@ while(1)
 		if(count_no == 3)
 		{
 		count_no = 0;
-		leds_on(LEDS_ALL);	
+		light_off();	
 		printf("No Human\n");
 		}
 	}

@@ -228,17 +228,26 @@
  * over JP3 connector.
  * @{
  */
-#define I2C_SCL_PORT             GPIO_C_NUM
-#define I2C_SCL_PIN              5 
-#define I2C_SDA_PORT             GPIO_C_NUM
-#define I2C_SDA_PIN              4
-#define I2C_INT_PORT             GPIO_D_NUM
-#define I2C_INT_PIN              1
-#define I2C_INT_VECTOR           GPIO_D_IRQn
+#define I2C_SCL_PORT             GPIO_A_NUM
+#define I2C_SCL_PIN              4 
+#define I2C_SDA_PORT             GPIO_A_NUM
+#define I2C_SDA_PIN              5 
+#define I2C_INT_PORT             GPIO_A_NUM
+#define I2C_INT_PIN              6
+#define I2C_INT_VECTOR           GPIO_A_IRQn
 /** @} */
 /*---------------------------------------------------------------------------*/
-#define PIR_INT_PORT             GPIO_C_NUM
-#define PIR_INT_PIN              6
+#define PIR_INT_PORT             GPIO_D_NUM
+#define PIR_INT_PIN              0 
+
+#define LED1_INT_PORT            GPIO_B_NUM
+#define LED1_INT_PIN             1
+#define LED2_INT_PORT            GPIO_B_NUM
+#define LED2_INT_PIN             2 
+#define LED3_INT_PORT            GPIO_B_NUM
+#define LED3_INT_PIN             3 
+#define LED4_INT_PORT            GPIO_B_NUM
+#define LED4_INT_PIN             4 
 /**
  * \name Device string used on startup
  * @{

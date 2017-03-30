@@ -1,8 +1,5 @@
 DEFINES+=PROJECT_CONF_H=\"project-conf.h\"
-
-CONTIKI_PROJECT = test-ac-dimmer
-
-CONTIKI_TARGET_SOURCEFILES += ac-dimmer.c
+CONTIKI_PROJECT = test-pwm
 
 all: $(CONTIKI_PROJECT)
 
