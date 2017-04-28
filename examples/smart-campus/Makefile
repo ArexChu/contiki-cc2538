@@ -30,7 +30,7 @@ CC2538DK_FW=bin
 
 all: $(PROJECT)
 
-CONTIKI?=../../..
+CONTIKI?=../..
 
 # automatically build RESTful resources
 REST_RESOURCES_DIR = ./resources
