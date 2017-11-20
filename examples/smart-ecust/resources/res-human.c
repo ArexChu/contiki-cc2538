@@ -38,17 +38,19 @@
 
 #include "contiki.h"
 
-#if PLATFORM_HAS_LEDS
+#if PLATFORM_HAS_LIGHT
 
 #include <string.h>
 #include "rest-engine.h"
-#include "dev/leds.h"
+
+#define PIR_INT_PORT_BASE  GPIO_PORT_TO_BASE(PIR_INT_PORT)
+#define PIR_INT_PIN_MASK   GPIO_PIN_MASK(PIR_INT_PIN)
 
 static void res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
-/* A simple getter example. Returns the reading from led status with a simple etag */
-RESOURCE(res_status,
-         "title=\"status (supports JSON)\";rt=\"LEDStatus\"",
+/* A simple getter example. Returns the reading from human sensor with a simple etag */
+RESOURCE(res_human,
+         "title=\"human (supports JSON)\";rt=\"HumanSensor\"",
          res_get_handler,
          NULL,
          NULL,
@@ -57,25 +59,24 @@ RESOURCE(res_status,
 static void
 res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-  unsigned char status = leds_get(); 
-  status = status ^ 0x07;
+  uint8_t human = GPIO_READ_PIN(PIR_INT_PORT_BASE, PIR_INT_PIN_MASK);
 
   unsigned int accept = -1;
   REST.get_header_accept(request, &accept);
 
   if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
     REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", status);
+    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", human);
 
     REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
   } else if(accept == REST.type.APPLICATION_XML) {
     REST.set_header_content_type(response, REST.type.APPLICATION_XML);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "<status=\"%d\"/>", status);
+    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "<human=\"%d\"/>", human);
 
     REST.set_response_payload(response, buffer, strlen((char *)buffer));
   } else if(accept == REST.type.APPLICATION_JSON) {
     REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'status':{'status':%d}", status);
+    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'human':{'human':%d}", human);
 
     REST.set_response_payload(response, buffer, strlen((char *)buffer));
   } else {
@@ -84,4 +85,4 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
     REST.set_response_payload(response, msg, strlen(msg));
   }
 }
-#endif /* PLATFORM_HAS_LEDS */
+#endif /* PLATFORM_HAS_LIGHT */

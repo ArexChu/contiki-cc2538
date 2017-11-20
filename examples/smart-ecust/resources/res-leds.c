@@ -93,9 +93,11 @@ res_post_put_handler(void *request, void *response, uint8_t *buffer, uint16_t pr
     PRINTF("mode %s\n", mode);
 
     if(strncmp(mode, "on", len) == 0) {
-      leds_on(led);
-    } else if(strncmp(mode, "off", len) == 0) {
+      //leds_on(led);
       leds_off(led);
+    } else if(strncmp(mode, "off", len) == 0) {
+      //leds_off(led);
+      leds_on(led);
     } else {
       success = 0;
     }

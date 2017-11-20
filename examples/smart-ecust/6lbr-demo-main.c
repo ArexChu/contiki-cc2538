@@ -77,13 +77,15 @@ extern resource_t
   res_push,
   res_event,
   res_sub,
-  res_b1_sep_b2;
+  res_b1_sep_b2,
+  res_occupy;
 #if PLATFORM_HAS_LEDS
 extern resource_t res_leds, res_toggle, res_status, res_dimmed;
 #endif
 #if PLATFORM_HAS_LIGHT
 #include "dev/tsl256x.h"
 extern resource_t res_light;
+extern resource_t res_human;
 #endif
 
 PROCESS(er_example_server, "Erbium Example Server");
@@ -226,22 +228,24 @@ PROCESS_THREAD(er_example_server, ev, data)
    * WARNING: Activating twice only means alternate path, not two instances!
    * All static variables are the same for each URI path.
    */
-//  rest_activate_resource(&res_hello, "test/hello");
+  rest_activate_resource(&res_hello, "test/hello");
+  rest_activate_resource(&res_occupy, "test/occupy");
 /*  rest_activate_resource(&res_mirror, "debug/mirror"); */
 /*  rest_activate_resource(&res_chunks, "test/chunks"); */
 /*  rest_activate_resource(&res_separate, "test/separate"); */
-  rest_activate_resource(&res_push, "test/push");
+//  rest_activate_resource(&res_push, "test/push");
 /*  rest_activate_resource(&res_event, "sensors/button"); */
 /*  rest_activate_resource(&res_sub, "test/sub"); */
 /*  rest_activate_resource(&res_b1_sep_b2, "test/b1sepb2"); */
 #if PLATFORM_HAS_LEDS
-//  rest_activate_resource(&res_leds, "actuators/leds");
-//  rest_activate_resource(&res_status, "status/leds");
-  rest_activate_resource(&res_dimmed, "dimmed/leds");
+  rest_activate_resource(&res_leds, "actuators/leds");
+  rest_activate_resource(&res_status, "status/leds");
+//  rest_activate_resource(&res_dimmed, "dimmed/leds");
 //  rest_activate_resource(&res_toggle, "actuators/toggle");
 #endif
 #if PLATFORM_HAS_LIGHT
   rest_activate_resource(&res_light, "sensors/light"); 
+  rest_activate_resource(&res_human, "sensors/human");
   /* Use Contiki's sensor macro to enable the sensor */
   SENSORS_ACTIVATE(tsl256x);
 

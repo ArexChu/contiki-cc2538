@@ -36,19 +36,23 @@
  *      Matthias Kovatsch <kovatsch@inf.ethz.ch>
  */
 
-#include "contiki.h"
-
-#if PLATFORM_HAS_LEDS
-
+#include <stdlib.h>
 #include <string.h>
 #include "rest-engine.h"
-#include "dev/leds.h"
+
+#define PIR_INT_PORT_BASE  GPIO_PORT_TO_BASE(PIR_INT_PORT)
+#define PIR_INT_PIN_MASK   GPIO_PIN_MASK(PIR_INT_PIN)
 
 static void res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
-/* A simple getter example. Returns the reading from led status with a simple etag */
-RESOURCE(res_status,
-         "title=\"status (supports JSON)\";rt=\"LEDStatus\"",
+/*
+ * A handler function named [resource name]_handler must be implemented for each RESOURCE.
+ * A buffer for the response payload is provided through the buffer pointer. Simple resources can ignore
+ * preferred_size and offset, but must respect the REST_MAX_CHUNK_SIZE limit for the buffer.
+ * If a smaller block size is requested for CoAP, the REST framework automatically splits the data.
+ */
+RESOURCE(res_occupy,
+         "title=\"cccupy: ?len=0..\";rt=\"Text\"",
          res_get_handler,
          NULL,
          NULL,
@@ -57,31 +61,33 @@ RESOURCE(res_status,
 static void
 res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-  unsigned char status = leds_get(); 
-  status = status ^ 0x07;
+  uint8_t human = GPIO_READ_PIN(PIR_INT_PORT_BASE, PIR_INT_PIN_MASK);
+  const char *len = NULL;
+  /* Some data that has the length up to REST_MAX_CHUNK_SIZE. For more, see the chunk resource. */
+  char const *const messageo = "OPEN";
+  char const *const messagec = "CLOSED";
+  char const *message = NULL; 
+  int length; /*           |<-------->| */
 
-  unsigned int accept = -1;
-  REST.get_header_accept(request, &accept);
-
-  if(accept == -1 || accept == REST.type.TEXT_PLAIN) {
-    REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "%d", status);
-
-    REST.set_response_payload(response, (uint8_t *)buffer, strlen((char *)buffer));
-  } else if(accept == REST.type.APPLICATION_XML) {
-    REST.set_header_content_type(response, REST.type.APPLICATION_XML);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "<status=\"%d\"/>", status);
-
-    REST.set_response_payload(response, buffer, strlen((char *)buffer));
-  } else if(accept == REST.type.APPLICATION_JSON) {
-    REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
-    snprintf((char *)buffer, REST_MAX_CHUNK_SIZE, "{'status':{'status':%d}", status);
-
-    REST.set_response_payload(response, buffer, strlen((char *)buffer));
+  if(human) {
+	message = messageo;
   } else {
-    REST.set_response_status(response, REST.status.NOT_ACCEPTABLE);
-    const char *msg = "Supporting content-types text/plain, application/xml, and application/json";
-    REST.set_response_payload(response, msg, strlen(msg));
+	message = messagec;
   }
+  length = strlen(message);
+  /* The query string can be retrieved by rest_get_query() or parsed for its key-value pairs. */
+  if(REST.get_query_variable(request, "len", &len)) {
+    length = atoi(len);
+    if(length < 0) {
+      length = 0;
+    }
+    if(length > REST_MAX_CHUNK_SIZE) {
+      length = REST_MAX_CHUNK_SIZE;
+    }
+    memcpy(buffer, message, length);
+  } else {
+    memcpy(buffer, message, length);
+  } REST.set_header_content_type(response, REST.type.TEXT_PLAIN); /* text/plain is the default, hence this option could be omitted. */
+  REST.set_header_etag(response, (uint8_t *)&length, 1);
+  REST.set_response_payload(response, buffer, length);
 }
-#endif /* PLATFORM_HAS_LEDS */

@@ -1,0 +1,159 @@
+/*
+ * Copyright (c) 2014, CETIC.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the Institute nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+/**
+ * \file
+ *         Simple CoAP Library
+ * \author
+ *         6LBR Team <6lbr@cetic.be>
+ */
+#ifndef LED_BLUE_SENSOR_RESOURCE_H
+#define LED_BLUE_SENSOR_RESOURCE_H
+
+#include "contiki.h"
+#include "coap-common.h"
+
+#if REST_CONF_PLATFORM_HAS_LED_BLUE
+#ifdef REST_CONF_RES_LED_BLUE
+#define REST_RES_LED_BLUE REST_CONF_RES_LED_BLUE
+#else
+#define REST_RES_LED_BLUE 1
+#endif
+#else
+#define REST_RES_LED_BLUE 0
+#endif
+
+#ifdef REST_CONF_RES_LED_BLUE_PERIODIC
+#define REST_RES_LED_BLUE_PERIODIC REST_CONF_RES_LED_BLUE_PERIODIC
+#else
+#define REST_RES_LED_BLUE_PERIODIC 0
+#endif
+
+#ifdef REST_CONF_RES_LED_BLUE_PERIOD
+#define REST_RES_LED_BLUE_PERIOD REST_CONF_RES_LED_BLUE_PERIOD
+#else
+#define REST_RES_LED_BLUE_PERIOD REST_DEFAULT_PERIOD
+#endif
+
+#ifdef REST_CONF_RES_LED_BLUE_SIMPLE
+#define REST_RES_LED_BLUE_SIMPLE REST_CONF_RES_LED_BLUE_SIMPLE
+#else
+#define REST_RES_LED_BLUE_SIMPLE 1
+#endif
+
+#ifdef REST_CONF_RES_LED_BLUE_EVENT
+#define REST_RES_LED_BLUE_EVENT REST_CONF_RES_LED_BLUE_EVENT
+#else
+#define REST_RES_LED_BLUE_EVENT 0
+#endif
+
+#ifdef REST_RES_LED_BLUE_RAW
+#define REST_RES_LED_BLUE_RAW REST_CONF_RES_LED_BLUE_RAW
+#else
+#define REST_RES_LED_BLUE_RAW 0
+#endif
+
+#ifdef REST_CONF_RES_LED_BLUE_FORMAT
+#define REST_REST_LED_BLUE_FORMAT REST_CONF_RES_LED_BLUE_FORMAT
+#else
+#if REST_RES_LED_BLUE_RAW
+#define REST_REST_LED_BLUE_FORMAT COAP_RESOURCE_TYPE_SIGNED_INT
+#else
+#define REST_REST_LED_BLUE_FORMAT COAP_RESOURCE_TYPE_DECIMAL_TWO
+#endif
+#endif
+
+#if REST_RES_LED_BLUE_SIMPLE
+#define REST_RES_LED_BLUE_INIT_RESOURCE INIT_RESOURCE
+#if REST_CONF_RES_LED_BLUE_ACTUATOR
+#define REST_RES_LED_BLUE_RESOURCE REST_ACTUATOR
+#else
+#if REST_RES_LED_BLUE_PERIODIC
+#define REST_RES_LED_BLUE_RESOURCE REST_PERIODIC_RESOURCE
+#else
+#define REST_RES_LED_BLUE_RESOURCE REST_RESOURCE
+#endif
+#endif
+#else /* REST_RES_LED_BLUE_SIMPLE */
+#define REST_RES_LED_BLUE_INIT_RESOURCE INIT_FULL_RESOURCE
+#define REST_RES_LED_BLUE_RESOURCE REST_FULL_RESOURCE
+#endif /* REST_RES_LED_BLUE_SIMPLE */
+
+#if REST_RES_LED_BLUE
+
+#define REST_RES_LED_BLUE_DECLARE() \
+  extern resource_t resource_led_blue;
+
+#define REST_RES_LED_BLUE_INIT_WITH_PATH(path) \
+  SENSOR_INIT_LED_BLUE(); \
+  REST_RES_LED_BLUE_INIT_RESOURCE(led_blue, path);
+
+#define REST_RES_LED_BLUE_INIT() \
+  REST_RES_LED_BLUE_INIT_WITH_PATH(REST_CONF_RES_LED_BLUE_IPSO_APP_FW_ID);
+
+#if REST_CONF_RES_LED_BLUE_ACTUATOR
+#define REST_RES_LED_BLUE_DEFINE() \
+  REST_RES_LED_BLUE_RESOURCE(led_blue, \
+    REST_RES_LED_BLUE_PERIOD, \
+    REST_CONF_RES_LED_BLUE_IF, \
+    REST_CONF_RES_LED_BLUE_TYPE, \
+    REST_REST_LED_BLUE_FORMAT, \
+    REST_CONF_RES_LED_BLUE_ID, \
+    REST_REST_LED_BLUE_VALUE, \
+    REST_REST_LED_BLUE_ACTUATOR)
+#else
+#define REST_RES_LED_BLUE_DEFINE() \
+  REST_RES_LED_BLUE_RESOURCE(led_blue, \
+    REST_RES_LED_BLUE_PERIOD, \
+    REST_CONF_RES_LED_BLUE_IF, \
+    REST_CONF_RES_LED_BLUE_TYPE, \
+    REST_REST_LED_BLUE_FORMAT, \
+    REST_CONF_RES_LED_BLUE_ID, \
+    REST_REST_LED_BLUE_VALUE)
+#endif
+
+#if REST_RES_LED_BLUE_EVENT
+#define REST_RES_LED_BLUE_EVENT_HANDLER(ev, data) REST_CONF_RES_LED_BLUE_EVENT_HANDLER(ev, data)
+#else
+#define REST_RES_LED_BLUE_EVENT_HANDLER(...)
+#endif
+
+#define REST_RES_LED_BLUE_REF &resource_led_blue,
+
+#else
+
+#define REST_RES_LED_BLUE_DECLARE(...)
+#define REST_RES_LED_BLUE_INIT_WITH_PATH(...)
+#define REST_RES_LED_BLUE_INIT(...)
+#define REST_RES_LED_BLUE_DEFINE(...)
+#define REST_RES_LED_BLUE_REF
+
+#endif
+
+#endif /* LED_BLUE_SENSOR_RESOURCE_H */
