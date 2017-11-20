@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Swedish Institute of Computer Science
+ * Copyright (c) 2014, CETIC.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,83 +25,37 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * This file is part of the Contiki operating system.
- *
- */
-/**
- * \addtogroup dev
- * @{
  */
 
 /**
- * \defgroup leds LEDs API
- *
- * The LEDs API defines a set of functions for accessing LEDs for
- * Contiki plaforms with LEDs.
- *
- * A platform with LED support must implement this API.
- * @{
+ * \file
+ *         Simple CoAP Library
+ * \author
+ *         6LBR Team <6lbr@cetic.be>
  */
 
-#ifndef LEDS_H_
-#define LEDS_H_
+#include "coap-time.h"
 
-/* Allow platform to override LED numbering */
-#include "contiki-conf.h"
+static uint32_t  startup_time;
+static int32_t time_offset;
 
-void leds_init(void);
+void
+coap_time_init(void) {
+  startup_time = clock_seconds();
+  time_offset = 0;
+}
 
-/**
- * Blink all LEDs.
- */
-void leds_blink(void);
+uint32_t
+coap_time_get_uptime(void) {
+  return clock_seconds() - startup_time;
+}
 
-#ifndef LEDS_GREEN
-#define LEDS_GREEN  1
-#endif /* LEDS_GREEN */
-#ifndef LEDS_YELLOW
-#define LEDS_YELLOW  2
-#endif /* LEDS_YELLOW */
-#ifndef LEDS_RED
-#define LEDS_RED  4
-#endif /* LEDS_RED */
-#ifndef LEDS_BLUE
-#define LEDS_BLUE  LEDS_YELLOW
-#endif /* LEDS_BLUE */
+uint32_t
+coap_time_get_time(void) {
+  return clock_seconds() + time_offset;
+}
 
-#ifdef LEDS_CONF_ALL
-#define LEDS_ALL    LEDS_CONF_ALL
-#else /* LEDS_CONF_ALL */
-#define LEDS_ALL    7
-#endif /* LEDS_CONF_ALL */
-
-#define LEDS_1  1
-#define LEDS_2  2
-#define LEDS_3  4
-#define LEDS_4  8
-#define LEDS_5  0x10
-#define LEDS_6  0x20
-#define LEDS_7  0x40 
-#define LEDS_8  0x80
-
-/**
- * Returns the current status of all leds
- */
-unsigned char leds_get(void);
-void leds_set(unsigned char leds);
-void leds_on(unsigned char leds);
-void leds_off(unsigned char leds);
-void leds_toggle(unsigned char leds);
-
-/**
- * Leds implementation
- */
-void leds_arch_init(void);
-unsigned char leds_arch_get(void);
-void leds_arch_set(unsigned char leds);
-
-#endif /* LEDS_H_ */
-
-/** @} */
-/** @} */
+void
+coap_time_set_time(uint32_t time) {
+  time_offset = time - clock_seconds();
+}

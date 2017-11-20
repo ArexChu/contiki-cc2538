@@ -86,7 +86,8 @@
 #define LEDS_CONF_ALL           14
 #define LEDS_RED                LEDS_ORANGE
 #else
-#define LEDS_CONF_ALL           15
+//#define LEDS_CONF_ALL           15
+#define LEDS_CONF_ALL           0xFF
 #define LEDS_RED                1 /**< LED1 (Red)    -> PC0 */
 #endif
 
@@ -240,14 +241,6 @@
 #define PIR_INT_PORT             GPIO_D_NUM
 #define PIR_INT_PIN              0 
 
-#define LED1_INT_PORT            GPIO_B_NUM
-#define LED1_INT_PIN             1
-#define LED2_INT_PORT            GPIO_B_NUM
-#define LED2_INT_PIN             2 
-#define LED3_INT_PORT            GPIO_B_NUM
-#define LED3_INT_PIN             3 
-#define LED4_INT_PORT            GPIO_B_NUM
-#define LED4_INT_PIN             4 
 /**
  * \name Device string used on startup
  * @{

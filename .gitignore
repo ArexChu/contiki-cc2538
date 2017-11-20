@@ -131,4 +131,3 @@ LOG_OPENOCD
 *.nrf52dk
 
 tags
-examples/smart-lab/

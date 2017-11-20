@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Swedish Institute of Computer Science
+ * Copyright (c) 2013, Institute for Pervasive Computing, ETH Zurich
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,81 +27,44 @@
  * SUCH DAMAGE.
  *
  * This file is part of the Contiki operating system.
- *
- */
-/**
- * \addtogroup dev
- * @{
  */
 
 /**
- * \defgroup leds LEDs API
- *
- * The LEDs API defines a set of functions for accessing LEDs for
- * Contiki plaforms with LEDs.
- *
- * A platform with LED support must implement this API.
- * @{
+ * \file
+ *      CoAP module for separate responses.
+ * \author
+ *      Matthias Kovatsch <kovatsch@inf.ethz.ch>
  */
 
-#ifndef LEDS_H_
-#define LEDS_H_
+#ifndef COAP_SEPARATE_H_
+#define COAP_SEPARATE_H_
 
-/* Allow platform to override LED numbering */
-#include "contiki-conf.h"
+#include "er-coap.h"
 
-void leds_init(void);
+typedef struct coap_separate {
 
-/**
- * Blink all LEDs.
- */
-void leds_blink(void);
+  uip_ipaddr_t addr;
+  uint16_t port;
+  context_t * ctx;
 
-#ifndef LEDS_GREEN
-#define LEDS_GREEN  1
-#endif /* LEDS_GREEN */
-#ifndef LEDS_YELLOW
-#define LEDS_YELLOW  2
-#endif /* LEDS_YELLOW */
-#ifndef LEDS_RED
-#define LEDS_RED  4
-#endif /* LEDS_RED */
-#ifndef LEDS_BLUE
-#define LEDS_BLUE  LEDS_YELLOW
-#endif /* LEDS_BLUE */
+  coap_message_type_t type;
+  uint16_t mid;
 
-#ifdef LEDS_CONF_ALL
-#define LEDS_ALL    LEDS_CONF_ALL
-#else /* LEDS_CONF_ALL */
-#define LEDS_ALL    7
-#endif /* LEDS_CONF_ALL */
+  uint8_t token_len;
+  uint8_t token[COAP_TOKEN_LEN];
 
-#define LEDS_1  1
-#define LEDS_2  2
-#define LEDS_3  4
-#define LEDS_4  8
-#define LEDS_5  0x10
-#define LEDS_6  0x20
-#define LEDS_7  0x40 
-#define LEDS_8  0x80
+  uint32_t block1_num;
+  uint16_t block1_size;
 
-/**
- * Returns the current status of all leds
- */
-unsigned char leds_get(void);
-void leds_set(unsigned char leds);
-void leds_on(unsigned char leds);
-void leds_off(unsigned char leds);
-void leds_toggle(unsigned char leds);
+  uint32_t block2_num;
+  uint16_t block2_size;
+} coap_separate_t;
 
-/**
- * Leds implementation
- */
-void leds_arch_init(void);
-unsigned char leds_arch_get(void);
-void leds_arch_set(unsigned char leds);
+int coap_separate_handler(resource_t *resource, void *request,
+                          void *response);
+void coap_separate_reject();
+void coap_separate_accept(void *request, coap_separate_t *separate_store);
+void coap_separate_resume(void *response, coap_separate_t *separate_store,
+                          uint8_t code);
 
-#endif /* LEDS_H_ */
-
-/** @} */
-/** @} */
+#endif /* COAP_SEPARATE_H_ */

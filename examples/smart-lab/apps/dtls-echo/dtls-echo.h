@@ -1,7 +1,4 @@
 /*
- * Copyright (c) 2005, Swedish Institute of Computer Science
- * All rights reserved.
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -29,79 +26,10 @@
  * This file is part of the Contiki operating system.
  *
  */
-/**
- * \addtogroup dev
- * @{
- */
+#ifndef DTLS_ECHO_H_
+#define DTLS_ECHO_H_
 
-/**
- * \defgroup leds LEDs API
- *
- * The LEDs API defines a set of functions for accessing LEDs for
- * Contiki plaforms with LEDs.
- *
- * A platform with LED support must implement this API.
- * @{
- */
+PROCESS_NAME(dtls_echo_server_process);
 
-#ifndef LEDS_H_
-#define LEDS_H_
 
-/* Allow platform to override LED numbering */
-#include "contiki-conf.h"
-
-void leds_init(void);
-
-/**
- * Blink all LEDs.
- */
-void leds_blink(void);
-
-#ifndef LEDS_GREEN
-#define LEDS_GREEN  1
-#endif /* LEDS_GREEN */
-#ifndef LEDS_YELLOW
-#define LEDS_YELLOW  2
-#endif /* LEDS_YELLOW */
-#ifndef LEDS_RED
-#define LEDS_RED  4
-#endif /* LEDS_RED */
-#ifndef LEDS_BLUE
-#define LEDS_BLUE  LEDS_YELLOW
-#endif /* LEDS_BLUE */
-
-#ifdef LEDS_CONF_ALL
-#define LEDS_ALL    LEDS_CONF_ALL
-#else /* LEDS_CONF_ALL */
-#define LEDS_ALL    7
-#endif /* LEDS_CONF_ALL */
-
-#define LEDS_1  1
-#define LEDS_2  2
-#define LEDS_3  4
-#define LEDS_4  8
-#define LEDS_5  0x10
-#define LEDS_6  0x20
-#define LEDS_7  0x40 
-#define LEDS_8  0x80
-
-/**
- * Returns the current status of all leds
- */
-unsigned char leds_get(void);
-void leds_set(unsigned char leds);
-void leds_on(unsigned char leds);
-void leds_off(unsigned char leds);
-void leds_toggle(unsigned char leds);
-
-/**
- * Leds implementation
- */
-void leds_arch_init(void);
-unsigned char leds_arch_get(void);
-void leds_arch_set(unsigned char leds);
-
-#endif /* LEDS_H_ */
-
-/** @} */
-/** @} */
+#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Swedish Institute of Computer Science
+ * Copyright (c) 2016, CETIC.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,83 +25,81 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * This file is part of the Contiki operating system.
- *
- */
-/**
- * \addtogroup dev
- * @{
  */
 
 /**
- * \defgroup leds LEDs API
- *
- * The LEDs API defines a set of functions for accessing LEDs for
- * Contiki plaforms with LEDs.
- *
- * A platform with LED support must implement this API.
- * @{
+ * \file
+ *         NVM Interface for the Econotag platform
+ * \author
+ *         6LBR Team <6lbr@cetic.be>
  */
 
-#ifndef LEDS_H_
-#define LEDS_H_
+#define LOG6LBR_MODULE "NVM"
 
-/* Allow platform to override LED numbering */
-#include "contiki-conf.h"
+#include "contiki.h"
+#include "contiki-lib.h"
 
-void leds_init(void);
+#include "nvm-config.h"
+#include "nvm-itf.h"
+#include "board-peripherals.h"
 
-/**
- * Blink all LEDs.
- */
-void leds_blink(void);
+//Temporarily
+//#include "log-6lbr.h"
+#include "stdio.h"
+#define LOG6LBR_INFO printf
+#define LOG6LBR_ERROR printf
+#define LOG6LBR_FATAL printf
 
-#ifndef LEDS_GREEN
-#define LEDS_GREEN  1
-#endif /* LEDS_GREEN */
-#ifndef LEDS_YELLOW
-#define LEDS_YELLOW  2
-#endif /* LEDS_YELLOW */
-#ifndef LEDS_RED
-#define LEDS_RED  4
-#endif /* LEDS_RED */
-#ifndef LEDS_BLUE
-#define LEDS_BLUE  LEDS_YELLOW
-#endif /* LEDS_BLUE */
+#define CETIC_6LBR_NVM_SIZE 2048
+#define CETIC_6LBR_NVM_ADDRESS 0
 
-#ifdef LEDS_CONF_ALL
-#define LEDS_ALL    LEDS_CONF_ALL
-#else /* LEDS_CONF_ALL */
-#define LEDS_ALL    7
-#endif /* LEDS_CONF_ALL */
+void
+nvm_data_read(void)
+{
+  LOG6LBR_INFO("Reading 6LBR NVM\n");
+  int rv = ext_flash_open();
 
-#define LEDS_1  1
-#define LEDS_2  2
-#define LEDS_3  4
-#define LEDS_4  8
-#define LEDS_5  0x10
-#define LEDS_6  0x20
-#define LEDS_7  0x40 
-#define LEDS_8  0x80
+  if(!rv) {
+    LOG6LBR_ERROR("Could not open external flash\n");
+    ext_flash_close();
+    return;
+  }
 
-/**
- * Returns the current status of all leds
- */
-unsigned char leds_get(void);
-void leds_set(unsigned char leds);
-void leds_on(unsigned char leds);
-void leds_off(unsigned char leds);
-void leds_toggle(unsigned char leds);
+  rv = ext_flash_read(CETIC_6LBR_NVM_ADDRESS, sizeof(nvm_data_t),
+                      (uint8_t *)&nvm_data);
 
-/**
- * Leds implementation
- */
-void leds_arch_init(void);
-unsigned char leds_arch_get(void);
-void leds_arch_set(unsigned char leds);
+  ext_flash_close();
 
-#endif /* LEDS_H_ */
+  if(!rv) {
+    printf("Error loading config\n");
+    return;
+  }
+}
 
-/** @} */
-/** @} */
+void
+nvm_data_write(void)
+{
+  LOG6LBR_INFO("Writing 6LBR NVM\n");
+  int rv;
+  rv = ext_flash_open();
+
+  if(!rv) {
+    LOG6LBR_ERROR("Could not open external flash\n");
+    ext_flash_close();
+    return;
+  }
+
+  rv = ext_flash_erase(CETIC_6LBR_NVM_ADDRESS, CETIC_6LBR_NVM_SIZE);
+
+  if(!rv) {
+    LOG6LBR_ERROR("Error erasing flash\n");
+  } else {
+    rv = ext_flash_write(CETIC_6LBR_NVM_ADDRESS, sizeof(nvm_data_t),
+                         (uint8_t *)&nvm_data);
+    if(!rv) {
+      LOG6LBR_ERROR("Error writing flash\n");
+    }
+  }
+
+  ext_flash_close();
+}

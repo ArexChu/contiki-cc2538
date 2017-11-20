@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Swedish Institute of Computer Science
+ * Copyright (c) 2010, Swedish Institute of Computer Science.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,82 +26,49 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * This file is part of the Contiki operating system.
- *
- */
-/**
- * \addtogroup dev
- * @{
  */
 
 /**
- * \defgroup leds LEDs API
- *
- * The LEDs API defines a set of functions for accessing LEDs for
- * Contiki plaforms with LEDs.
- *
- * A platform with LED support must implement this API.
- * @{
+ * \file
+ *         A simple webserver
+ * \author
+ *         Adam Dunkels <adam@sics.se>
+ *         Niclas Finne <nfi@sics.se>
+ *         Joakim Eriksson <joakime@sics.se>
  */
 
-#ifndef LEDS_H_
-#define LEDS_H_
+#ifndef __HTTPD_SIMPLE_H__
+#define __HTTPD_SIMPLE_H__
 
-/* Allow platform to override LED numbering */
-#include "contiki-conf.h"
+#include "contiki-net.h"
 
-void leds_init(void);
+/* The current internal border router webserver ignores the requested file name */
+/* and needs no per-connection output buffer, so save some RAM */
+#ifndef WEBSERVER_CONF_CFS_PATHLEN
+#define HTTPD_PATHLEN 2
+#else /* WEBSERVER_CONF_CFS_CONNS */
+#define HTTPD_PATHLEN WEBSERVER_CONF_CFS_PATHLEN
+#endif /* WEBSERVER_CONF_CFS_CONNS */
 
-/**
- * Blink all LEDs.
- */
-void leds_blink(void);
+struct httpd_state;
+typedef char (* httpd_simple_script_t)(struct httpd_state *s);
 
-#ifndef LEDS_GREEN
-#define LEDS_GREEN  1
-#endif /* LEDS_GREEN */
-#ifndef LEDS_YELLOW
-#define LEDS_YELLOW  2
-#endif /* LEDS_YELLOW */
-#ifndef LEDS_RED
-#define LEDS_RED  4
-#endif /* LEDS_RED */
-#ifndef LEDS_BLUE
-#define LEDS_BLUE  LEDS_YELLOW
-#endif /* LEDS_BLUE */
+struct httpd_state {
+  struct timer timer;
+  struct psock sin, sout;
+  struct pt outputpt;
+  char inputbuf[HTTPD_PATHLEN + 24];
+/*char outputbuf[UIP_TCP_MSS]; */
+  char filename[HTTPD_PATHLEN];
+  httpd_simple_script_t script;
+  char state;
+};
 
-#ifdef LEDS_CONF_ALL
-#define LEDS_ALL    LEDS_CONF_ALL
-#else /* LEDS_CONF_ALL */
-#define LEDS_ALL    7
-#endif /* LEDS_CONF_ALL */
+void httpd_init(void);
+void httpd_appcall(void *state);
 
-#define LEDS_1  1
-#define LEDS_2  2
-#define LEDS_3  4
-#define LEDS_4  8
-#define LEDS_5  0x10
-#define LEDS_6  0x20
-#define LEDS_7  0x40 
-#define LEDS_8  0x80
+httpd_simple_script_t httpd_simple_get_script(const char *name);
 
-/**
- * Returns the current status of all leds
- */
-unsigned char leds_get(void);
-void leds_set(unsigned char leds);
-void leds_on(unsigned char leds);
-void leds_off(unsigned char leds);
-void leds_toggle(unsigned char leds);
+#define SEND_STRING(s, str) PSOCK_SEND(s, (uint8_t *)str, strlen(str))
 
-/**
- * Leds implementation
- */
-void leds_arch_init(void);
-unsigned char leds_arch_get(void);
-void leds_arch_set(unsigned char leds);
-
-#endif /* LEDS_H_ */
-
-/** @} */
-/** @} */
+#endif /* __HTTPD_SIMPLE_H__ */

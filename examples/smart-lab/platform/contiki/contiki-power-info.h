@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Swedish Institute of Computer Science
+ * Copyright (c) 2015, CETIC.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,83 +25,36 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * This file is part of the Contiki operating system.
- *
- */
-/**
- * \addtogroup dev
- * @{
  */
 
 /**
- * \defgroup leds LEDs API
- *
- * The LEDs API defines a set of functions for accessing LEDs for
- * Contiki plaforms with LEDs.
- *
- * A platform with LED support must implement this API.
- * @{
+ * \file
+ *         6LBR-Demo Project Configuration
+ * \author
+ *         6LBR Team <6lbr@cetic.be>
  */
 
-#ifndef LEDS_H_
-#define LEDS_H_
+#ifndef CONTIKI_POWER_INFO_H
+#define CONTIKI_POWER_INFO_H
 
-/* Allow platform to override LED numbering */
-#include "contiki-conf.h"
+#include "contiki.h"
 
-void leds_init(void);
+#include "coap-common.h"
+#include "core-interface.h"
 
-/**
- * Blink all LEDs.
- */
-void leds_blink(void);
+#if WITH_LWM2M
+#include "lwm2m.h"
+#include "ipso-so.h"
+#endif
 
-#ifndef LEDS_GREEN
-#define LEDS_GREEN  1
-#endif /* LEDS_GREEN */
-#ifndef LEDS_YELLOW
-#define LEDS_YELLOW  2
-#endif /* LEDS_YELLOW */
-#ifndef LEDS_RED
-#define LEDS_RED  4
-#endif /* LEDS_RED */
-#ifndef LEDS_BLUE
-#define LEDS_BLUE  LEDS_YELLOW
-#endif /* LEDS_BLUE */
+#if WITH_IPSO_APP_FW
+#include "ipso-app-fw.h"
+#endif
 
-#ifdef LEDS_CONF_ALL
-#define LEDS_ALL    LEDS_CONF_ALL
-#else /* LEDS_CONF_ALL */
-#define LEDS_ALL    7
-#endif /* LEDS_CONF_ALL */
+#include "contiki-resources.h"
+#include "battery-resource.h"
 
-#define LEDS_1  1
-#define LEDS_2  2
-#define LEDS_3  4
-#define LEDS_4  8
-#define LEDS_5  0x10
-#define LEDS_6  0x20
-#define LEDS_7  0x40 
-#define LEDS_8  0x80
+#define LWM2M_DEVICE_POWER_VOLTAGE_DECLARE REST_RES_BATTERY_DECLARE
+#define LWM2M_DEVICE_POWER_VOLTAGE_REF REST_RES_BATTERY_REF
 
-/**
- * Returns the current status of all leds
- */
-unsigned char leds_get(void);
-void leds_set(unsigned char leds);
-void leds_on(unsigned char leds);
-void leds_off(unsigned char leds);
-void leds_toggle(unsigned char leds);
-
-/**
- * Leds implementation
- */
-void leds_arch_init(void);
-unsigned char leds_arch_get(void);
-void leds_arch_set(unsigned char leds);
-
-#endif /* LEDS_H_ */
-
-/** @} */
-/** @} */
+#endif
