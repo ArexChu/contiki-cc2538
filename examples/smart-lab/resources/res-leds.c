@@ -78,12 +78,22 @@ res_post_put_handler(void *request, void *response, uint8_t *buffer, uint16_t pr
   if((len = REST.get_query_variable(request, "color", &color))) {
     PRINTF("color %.*s\n", len, color);
 
-    if(strncmp(color, "led1", len) == 0) {
+    if(strncmp(color+1, "led1", len-1) == 0) {
       led = LEDS_1;
-    } else if(strncmp(color, "led2", len) == 0) {
+    } else if(strncmp(color+1, "led2", len-1) == 0) {
       led = LEDS_2;
-    } else if(strncmp(color, "led3", len) == 0) {
+    } else if(strncmp(color+1, "led3", len-1) == 0) {
       led = LEDS_3;
+    } else if(strncmp(color+1, "led4", len-1) == 0) {
+      led = LEDS_4;
+    } else if(strncmp(color+1, "led5", len-1) == 0) {
+      led = LEDS_5;
+    } else if(strncmp(color+1, "led6", len-1) == 0) {
+      led = LEDS_6;
+    } else if(strncmp(color+1, "led7", len-1) == 0) {
+      led = LEDS_7;
+    } else if(strncmp(color+1, "led8", len-1) == 0) {
+      led = LEDS_8;
     } else {
       success = 0;
     }
@@ -92,12 +102,18 @@ res_post_put_handler(void *request, void *response, uint8_t *buffer, uint16_t pr
   } if(success && (len = REST.get_post_variable(request, "mode", &mode))) {
     PRINTF("mode %s\n", mode);
 
-    if(strncmp(mode, "on", len) == 0) {
-      //leds_on(led);
-      leds_off(led);
-    } else if(strncmp(mode, "off", len) == 0) {
-      //leds_off(led);
-      leds_on(led);
+    if(strncmp(color, "b", 1) == 0) {
+    	if(strncmp(mode, "on", len) == 0) {
+    	  leds_b_on(led);
+    	} else if(strncmp(mode, "off", len) == 0) {
+    	  leds_b_off(led);
+		}
+	} else if(strncmp(color, "d", 1) == 0) {
+    	if(strncmp(mode, "on", len) == 0) {
+    	  leds_d_on(led);
+    	} else if(strncmp(mode, "off", len) == 0) {
+    	  leds_d_off(led);
+		}
     } else {
       success = 0;
     }

@@ -46,26 +46,63 @@
 #include "dev/gpio.h"
 
 #define LEDS_GPIO_PIN_MASK   LEDS_ALL
+#define LEDS_B_GPIO_PIN_MASK   LEDS_B_ALL
+#define LEDS_D_GPIO_PIN_MASK   LEDS_D_ALL
 /*---------------------------------------------------------------------------*/
 void
 leds_arch_init(void)
 {
-  //GPIO_SET_OUTPUT(GPIO_C_BASE, LEDS_GPIO_PIN_MASK);
-  GPIO_SET_OUTPUT(GPIO_B_BASE, LEDS_GPIO_PIN_MASK);
+  GPIO_SET_OUTPUT(GPIO_C_BASE, LEDS_GPIO_PIN_MASK);
 }
 /*---------------------------------------------------------------------------*/
 unsigned char
 leds_arch_get(void)
 {
-  //return GPIO_READ_PIN(GPIO_C_BASE, LEDS_GPIO_PIN_MASK);
-  return GPIO_READ_PIN(GPIO_B_BASE, LEDS_GPIO_PIN_MASK);
+  return GPIO_READ_PIN(GPIO_C_BASE, LEDS_GPIO_PIN_MASK);
 }
 /*---------------------------------------------------------------------------*/
 void
 leds_arch_set(unsigned char leds)
 {
-  //GPIO_WRITE_PIN(GPIO_C_BASE, LEDS_GPIO_PIN_MASK, leds);
-  GPIO_WRITE_PIN(GPIO_B_BASE, LEDS_GPIO_PIN_MASK, leds);
+  GPIO_WRITE_PIN(GPIO_C_BASE, LEDS_GPIO_PIN_MASK, leds);
+}
+/*---------------------------------------------------------------------------*/
+
+void
+leds_b_arch_init(void)
+{
+  GPIO_SET_OUTPUT(GPIO_B_BASE, LEDS_B_GPIO_PIN_MASK);
+}
+/*---------------------------------------------------------------------------*/
+unsigned char
+leds_b_arch_get(void)
+{
+  return GPIO_READ_PIN(GPIO_B_BASE, LEDS_B_GPIO_PIN_MASK);
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_b_arch_set(unsigned char leds)
+{
+  GPIO_WRITE_PIN(GPIO_B_BASE, LEDS_B_GPIO_PIN_MASK, leds);
+}
+/*---------------------------------------------------------------------------*/
+
+void
+leds_d_arch_init(void)
+{
+  GPIO_SET_OUTPUT(GPIO_D_BASE, LEDS_D_GPIO_PIN_MASK);
+}
+/*---------------------------------------------------------------------------*/
+unsigned char
+leds_d_arch_get(void)
+{
+  return GPIO_READ_PIN(GPIO_D_BASE, LEDS_D_GPIO_PIN_MASK);
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_d_arch_set(unsigned char leds)
+{
+  GPIO_WRITE_PIN(GPIO_D_BASE, LEDS_D_GPIO_PIN_MASK, leds);
 }
 /*---------------------------------------------------------------------------*/
 

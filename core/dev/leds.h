@@ -76,6 +76,9 @@ void leds_blink(void);
 #define LEDS_ALL    7
 #endif /* LEDS_CONF_ALL */
 
+#define LEDS_B_ALL    0xff
+#define LEDS_D_ALL    0x0f
+
 #define LEDS_1  1
 #define LEDS_2  2
 #define LEDS_3  4
@@ -94,12 +97,30 @@ void leds_on(unsigned char leds);
 void leds_off(unsigned char leds);
 void leds_toggle(unsigned char leds);
 
+unsigned char leds_b_get(void);
+void leds_b_set(unsigned char leds);
+void leds_b_on(unsigned char leds);
+void leds_b_off(unsigned char leds);
+
+unsigned char leds_d_get(void);
+void leds_d_set(unsigned char leds);
+void leds_d_on(unsigned char leds);
+void leds_d_off(unsigned char leds);
+
 /**
  * Leds implementation
  */
 void leds_arch_init(void);
 unsigned char leds_arch_get(void);
 void leds_arch_set(unsigned char leds);
+
+void leds_b_arch_init(void);
+unsigned char leds_b_arch_get(void);
+void leds_b_arch_set(unsigned char leds);
+
+void leds_d_arch_init(void);
+unsigned char leds_d_arch_get(void);
+void leds_d_arch_set(unsigned char leds);
 
 #endif /* LEDS_H_ */
 

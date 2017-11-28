@@ -86,8 +86,7 @@
 #define LEDS_CONF_ALL           14
 #define LEDS_RED                LEDS_ORANGE
 #else
-//#define LEDS_CONF_ALL           15
-#define LEDS_CONF_ALL           0xFF
+#define LEDS_CONF_ALL           15
 #define LEDS_RED                1 /**< LED1 (Red)    -> PC0 */
 #endif
 

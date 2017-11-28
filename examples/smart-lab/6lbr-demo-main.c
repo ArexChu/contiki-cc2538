@@ -213,7 +213,7 @@ PROCESS_THREAD(er_example_server, ev, data)
    * WARNING: Activating twice only means alternate path, not two instances!
    * All static variables are the same for each URI path.
    */
-  rest_activate_resource(&res_hello, "test/hello");
+//  rest_activate_resource(&res_hello, "test/hello");
 /*  rest_activate_resource(&res_mirror, "debug/mirror"); */
 /*  rest_activate_resource(&res_chunks, "test/chunks"); */
 /*  rest_activate_resource(&res_separate, "test/separate"); */
@@ -242,21 +242,21 @@ PROCESS_THREAD(er_example_server, ev, data)
 #endif
 */
 
-  /* Define application-specific events here. */
-  while(1) {
-    PROCESS_WAIT_EVENT();
-#if PLATFORM_HAS_BUTTON
-    if(ev == sensors_event && data == &button_sensor) {
-      PRINTF("*******BUTTON*******\n");
-
-      /* Call the event_handler for this application-specific event. */
-      res_event.trigger();
-
-      /* Also call the separate response example handler. */
-      res_separate.resume();
-    }
-#endif /* PLATFORM_HAS_BUTTON */
-  }                             /* while (1) */
+//  /* Define application-specific events here. */
+//  while(1) {
+//    PROCESS_WAIT_EVENT();
+//#if PLATFORM_HAS_BUTTON
+//    if(ev == sensors_event && data == &button_sensor) {
+//      PRINTF("*******BUTTON*******\n");
+//
+//      /* Call the event_handler for this application-specific event. */
+//      res_event.trigger();
+//
+//      /* Also call the separate response example handler. */
+//      res_separate.resume();
+//    }
+//#endif /* PLATFORM_HAS_BUTTON */
+//  }                             /* while (1) */
 
   PROCESS_END();
 }

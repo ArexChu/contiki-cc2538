@@ -35,6 +35,8 @@
 #include "sys/energest.h"
 
 static unsigned char leds;
+static unsigned char leds_b;
+static unsigned char leds_d;
 /*---------------------------------------------------------------------------*/
 static void
 show_leds(unsigned char new_leds)
@@ -73,6 +75,12 @@ leds_init(void)
 {
   leds_arch_init();
   leds = 0;
+
+  leds_b_arch_init();
+  leds_b = 0;
+
+  leds_d_arch_init();
+  leds_d = 0;
 }
 /*---------------------------------------------------------------------------*/
 void
@@ -115,5 +123,71 @@ void
 leds_toggle(unsigned char ledv)
 {
   show_leds(leds ^ ledv);
+}
+/*---------------------------------------------------------------------------*/
+
+static void
+show_leds_b(unsigned char new_leds)
+{
+  unsigned char changed;
+  changed = leds ^ new_leds;
+  leds_b = new_leds;
+  leds_b_arch_set(leds_b);
+}
+/*---------------------------------------------------------------------------*/
+unsigned char
+leds_b_get(void) {
+  return leds_b_arch_get();
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_b_set(unsigned char ledv)
+{
+  show_leds_b(ledv);
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_b_on(unsigned char ledv)
+{
+  show_leds_b(leds_b | ledv);
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_b_off(unsigned char ledv)
+{
+  show_leds_b(leds_b & ~ledv);
+}
+/*---------------------------------------------------------------------------*/
+
+static void
+show_leds_d(unsigned char new_leds)
+{
+  unsigned char changed;
+  changed = leds ^ new_leds;
+  leds_d = new_leds;
+  leds_d_arch_set(leds_d);
+}
+/*---------------------------------------------------------------------------*/
+unsigned char
+leds_d_get(void) {
+  return leds_d_arch_get();
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_d_set(unsigned char ledv)
+{
+  show_leds_d(ledv);
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_d_on(unsigned char ledv)
+{
+  show_leds_d(leds_d | ledv);
+}
+/*---------------------------------------------------------------------------*/
+void
+leds_d_off(unsigned char ledv)
+{
+  show_leds_d(leds_d & ~ledv);
 }
 /*---------------------------------------------------------------------------*/
