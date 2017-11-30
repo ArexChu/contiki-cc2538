@@ -1,1 +1,0 @@
-GEN_FILES+=./dyn_resources/sht-temp-resource.h ./dyn_resources/sht-humidity-resource.h ./dyn_resources/battery-resource.h ./dyn_resources/radio-lqi-resource.h ./dyn_resources/radio-rssi-resource.h ./dyn_resources/button-resource.h ./dyn_resources/led-red-resource.h ./dyn_resources/led-green-resource.h ./dyn_resources/led-blue-resource.h
