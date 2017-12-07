@@ -87,6 +87,15 @@ extern resource_t res_leds, res_toggle, res_status, res_dimmed;
 extern resource_t res_light;
 extern resource_t res_human;
 #endif
+#if PLATFORM_HAS_BATTERY
+extern resource_t res_battery;
+#endif
+#if PLATFORM_HAS_RADIO
+extern resource_t res_radio;
+#endif
+#if PLATFORM_HAS_SHT11
+extern resource_t res_sht11;
+#endif
 
 PROCESS(er_example_server, "Erbium Example Server");
 PROCESS(demo_6lbr_process, "6LBR Demo");
@@ -228,8 +237,8 @@ PROCESS_THREAD(er_example_server, ev, data)
    * WARNING: Activating twice only means alternate path, not two instances!
    * All static variables are the same for each URI path.
    */
-  rest_activate_resource(&res_hello, "test/hello");
-  rest_activate_resource(&res_occupy, "test/occupy");
+//  rest_activate_resource(&res_hello, "test/hello");
+//  rest_activate_resource(&res_occupy, "test/occupy");
 /*  rest_activate_resource(&res_mirror, "debug/mirror"); */
 /*  rest_activate_resource(&res_chunks, "test/chunks"); */
 /*  rest_activate_resource(&res_separate, "test/separate"); */
@@ -268,7 +277,7 @@ PROCESS_THREAD(er_example_server, ev, data)
 
   /* And periodically poll the sensor */
 #endif
-/*
+
 #if PLATFORM_HAS_BATTERY
   rest_activate_resource(&res_battery, "sensors/battery");  
   SENSORS_ACTIVATE(battery_sensor);  
@@ -281,7 +290,7 @@ PROCESS_THREAD(er_example_server, ev, data)
   rest_activate_resource(&res_sht11, "sensors/sht11");  
   SENSORS_ACTIVATE(sht11_sensor);  
 #endif
-*/
+
 
   /* Define application-specific events here. */
   while(1) {

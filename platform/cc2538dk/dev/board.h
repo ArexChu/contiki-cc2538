@@ -229,16 +229,16 @@
  * @{
  */
 #define I2C_SCL_PORT             GPIO_A_NUM
-#define I2C_SCL_PIN              4 
+#define I2C_SCL_PIN              2 
 #define I2C_SDA_PORT             GPIO_A_NUM
-#define I2C_SDA_PIN              5 
+#define I2C_SDA_PIN              3 
 #define I2C_INT_PORT             GPIO_A_NUM
-#define I2C_INT_PIN              6
+#define I2C_INT_PIN              4
 #define I2C_INT_VECTOR           GPIO_A_IRQn
 /** @} */
 /*---------------------------------------------------------------------------*/
-#define PIR_INT_PORT             GPIO_D_NUM
-#define PIR_INT_PIN              0 
+#define PIR_INT_PORT             GPIO_A_NUM
+#define PIR_INT_PIN              5 
 
 /**
  * \name Device string used on startup
