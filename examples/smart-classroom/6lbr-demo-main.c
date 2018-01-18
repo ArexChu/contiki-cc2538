@@ -278,18 +278,18 @@ PROCESS_THREAD(er_example_server, ev, data)
   /* And periodically poll the sensor */
 #endif
 
-#if PLATFORM_HAS_BATTERY
-  rest_activate_resource(&res_battery, "sensors/battery");  
-  SENSORS_ACTIVATE(battery_sensor);  
-#endif
-#if PLATFORM_HAS_RADIO
-  rest_activate_resource(&res_radio, "sensors/radio");  
-  SENSORS_ACTIVATE(radio_sensor);  
-#endif
-#if PLATFORM_HAS_SHT11
-  rest_activate_resource(&res_sht11, "sensors/sht11");  
-  SENSORS_ACTIVATE(sht11_sensor);  
-#endif
+//#if PLATFORM_HAS_BATTERY
+//  rest_activate_resource(&res_battery, "sensors/battery");  
+//  SENSORS_ACTIVATE(battery_sensor);  
+//#endif
+//#if PLATFORM_HAS_RADIO
+//  rest_activate_resource(&res_radio, "sensors/radio");  
+//  SENSORS_ACTIVATE(radio_sensor);  
+//#endif
+//#if PLATFORM_HAS_SHT11
+//  rest_activate_resource(&res_sht11, "sensors/sht11");  
+//  SENSORS_ACTIVATE(sht11_sensor);  
+//#endif
 
 
   /* Define application-specific events here. */
