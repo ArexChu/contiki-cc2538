@@ -87,15 +87,19 @@ extern resource_t res_leds, res_toggle, res_status, res_dimmed;
 extern resource_t res_light;
 extern resource_t res_human;
 #endif
-#if PLATFORM_HAS_BATTERY
-extern resource_t res_battery;
+#if PLATFORM_HAS_HUMAN
+extern resource_t res_human;
 #endif
-#if PLATFORM_HAS_RADIO
-extern resource_t res_radio;
-#endif
-#if PLATFORM_HAS_SHT11
-extern resource_t res_sht11;
-#endif
+
+//#if PLATFORM_HAS_BATTERY
+//extern resource_t res_battery;
+//#endif
+//#if PLATFORM_HAS_RADIO
+//extern resource_t res_radio;
+//#endif
+//#if PLATFORM_HAS_SHT11
+//extern resource_t res_sht11;
+//#endif
 
 PROCESS(er_example_server, "Erbium Example Server");
 PROCESS(demo_6lbr_process, "6LBR Demo");
@@ -254,7 +258,6 @@ PROCESS_THREAD(er_example_server, ev, data)
 #endif
 #if PLATFORM_HAS_LIGHT
   rest_activate_resource(&res_light, "sensors/light"); 
-  rest_activate_resource(&res_human, "sensors/human");
   /* Use Contiki's sensor macro to enable the sensor */
   SENSORS_ACTIVATE(tsl256x);
 
@@ -276,6 +279,9 @@ PROCESS_THREAD(er_example_server, ev, data)
   tsl256x.configure(TSL256X_INT_OVER, 0x15B8);
 
   /* And periodically poll the sensor */
+#endif
+#if PLATFORM_HAS_HUMAN
+  rest_activate_resource(&res_human, "sensors/human");
 #endif
 
 //#if PLATFORM_HAS_BATTERY

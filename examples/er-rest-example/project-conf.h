@@ -40,19 +40,19 @@
 #define __PROJECT_ERBIUM_CONF_H__
 
 /* Custom channel and PAN ID configuration for your project. */
-/*
-   #undef RF_CHANNEL
-   #define RF_CHANNEL                     26
 
-   #undef IEEE802154_CONF_PANID
-   #define IEEE802154_CONF_PANID          0xABCD
- */
+#undef RF_CHANNEL
+#define RF_CHANNEL                     26
+
+#undef IEEE802154_CONF_PANID
+#define IEEE802154_CONF_PANID          0xABCD
+
 
 /* IP buffer size must match all other hops, in particular the border router. */
-/*
-   #undef UIP_CONF_BUFFER_SIZE
-   #define UIP_CONF_BUFFER_SIZE           256
- */
+
+#undef UIP_CONF_BUFFER_SIZE
+#define UIP_CONF_BUFFER_SIZE           256
+
 
 /* Disabling RDC and CSMA for demo purposes. Core updates often
    require more memory. */

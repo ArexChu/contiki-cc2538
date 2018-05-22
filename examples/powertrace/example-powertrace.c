@@ -84,7 +84,7 @@ PROCESS_THREAD(example_broadcast_process, ev, data)
 
     packetbuf_copyfrom("Hello", 6);
     broadcast_send(&broadcast);
-    printf("broadcast message sent\n");
+    //printf("broadcast message sent\n");
   }
 
   PROCESS_END();

@@ -129,8 +129,6 @@ leds_toggle(unsigned char ledv)
 static void
 show_leds_b(unsigned char new_leds)
 {
-  unsigned char changed;
-  changed = leds ^ new_leds;
   leds_b = new_leds;
   leds_b_arch_set(leds_b);
 }
@@ -162,8 +160,6 @@ leds_b_off(unsigned char ledv)
 static void
 show_leds_d(unsigned char new_leds)
 {
-  unsigned char changed;
-  changed = leds ^ new_leds;
   leds_d = new_leds;
   leds_d_arch_set(leds_d);
 }
